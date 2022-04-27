@@ -1,0 +1,47 @@
+From 3b4ce7011894d18e4612d8c44cde66d1a2fa408c Mon Sep 17 00:00:00 2001
+From: Johannes Griessbach <jgrieszbach@gmail.com>
+Date: Mon, 5 Jul 2021 18:11:57 +0200
+Subject: [PATCH 2/2] add tags on sync copy questions
+
+---
+ question/question.php | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/question/question.php b/question/question.php
+index 2cf792674d2..e774e2c297b 100644
+--- a/question/question.php
++++ b/question/question.php
+@@ -329,7 +329,7 @@ if ($mform->is_cancelled()) {
+ 
+                 $local_form_copy->id = 0;
+                 $local_form_copy->name =  $local_question_to_save->name;
+-                $qtypeobj->save_question($local_question_to_save, $local_form_copy);            
++                $qtypeobj->save_question($local_question_to_save, $local_form_copy);                  
+             }
+         }
+         else if($count == $copycount) {            
+@@ -358,6 +358,21 @@ if ($mform->is_cancelled()) {
+         $synccopies =  $DB->get_records('question', array('name' => 'synccopy of '.$questionToCopy->name), 'id');
+         
+         foreach ($synccopies as $copyentry) {
++
++            array_push($fromform_clone_for_sync->tags, "synccopy");
++            if (isset($fromform_clone_for_sync->tags)) {
++                // If we have any question context level tags then set those tags now.
++                core_tag_tag::set_item_tags('core_question', 'question', $copyentry->id,
++                        context::instance_by_id($contextid), $fromform_clone_for_sync->tags, 0);
++            }
++        
++            if (isset($fromform_clone_for_sync->coursetags)) {
++                // If we have and course context level tags then set those now.
++                core_tag_tag::set_item_tags('core_question', 'question', $copyentry->id,
++                        context_course::instance($fromform_clone_for_sync->courseid), $fromform_clone_for_sync->coursetags, 0);
++            }
++
++
+             // delete old seeds 
+             $DB->delete_records('qtype_stack_deployed_seeds', array("questionid" => $copyentry->id));
+         }            
+-- 
+2.20.1
+

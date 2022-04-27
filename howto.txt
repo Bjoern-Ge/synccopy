@@ -1,0 +1,5 @@
+Aufgabe
+Fragen 4 mal kopieren, hierbei die Varianten gleichmäßig aufteilen und den Tag synccopie setzen
+Einspielen 
+cd /var/www/moodle/
+git apply ...
